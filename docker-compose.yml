@@ -1,0 +1,27 @@
+services:
+  s4e-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: s4e-mcp:local
+    container_name: s4e-mcp
+    env_file:
+      - .env
+    environment:
+      # Override from shell: MCP_DEBUG=1 docker compose up
+      MCP_DEBUG: ${MCP_DEBUG:-}
+      # Force listen port inside the container. .env MCP_PORT is the host publish
+      # port (default 8787) and must not leak in via env_file.
+      MCP_PORT: "8000"
+    ports:
+      - "${MCP_PORT:-8787}:8000"
+    extra_hosts:
+      # Linux → host.docker.internal. Mac / Windows Desktop zaten sağlıyor.
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:8000/health" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

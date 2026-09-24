@@ -1,0 +1,46 @@
+{
+  "name": "@s4e.io/mcp-server",
+  "version": "1.0.0",
+  "description": "MCP Server for S4E.io - Security Platform",
+  "main": "dist/http.js",
+  "bin": {
+    "s4e-mcp": "dist/http.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/http.js",
+    "dev": "tsx watch src/http.ts",
+    "typecheck": "tsc --noEmit",
+    "docker:build": "docker build -t s4e-mcp:local .",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "s4e",
+    "security",
+    "hono",
+    "docker",
+    "kubernetes"
+  ],
+  "author": "S4E Team",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@hono/node-server": "^1.13.0",
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "dotenv": "^16.4.5",
+    "hono": "^4.6.0",
+    "undici": "^6.25.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.9.3"
+  }
+}
