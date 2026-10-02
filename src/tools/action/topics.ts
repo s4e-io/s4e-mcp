@@ -53,12 +53,41 @@ Example Usage:
   trigger: `Run/Test an Action (trigger_action)
 
 Manually runs an already-assigned, active (status=1) action. Returns immediately
-with a slug — poll the action's output (not yet exposed via MCP) to see the
-result. Pending-approval or disabled assignments cannot be triggered.
+with a slug — read the result with get_action_output (status 0=running,
+1=success, 2=error, 3=timeout). Pending-approval or disabled assignments cannot be triggered.
 
 Example Usage:
 - "Run action <uuid> now"
 - "Test action <uuid> with these custom parameters: {...}"`,
+
+  update: `Update an Action Assignment (update_action)
+
+Changes custom_parameters, interval (minutes) and/or scan_slugs of an existing
+assignment. Omitted fields keep their stored value; at least one is required.
+custom_parameters replaces the stored object, so send the full object. The
+assignment status is not changed.
+
+Example Usage:
+- "Run action <uuid> every 2 days" (interval=2880)
+- "Change the rules of action <uuid> to ..."`,
+
+  output: `Action Run Result (get_action_output)
+
+Reads one run by the slug trigger_action returned. status: 0=running,
+1=success, 2=error, 3=timeout. Poll while status is 0.
+
+Example Usage:
+- "Show the result of run <slug>"`,
+
+  history: `Action Run History (list_action_runs)
+
+Lists all past runs of an assigned action, newest first. total_count is the
+number of matching runs; filter by status=1 (success) or status=2 (error) to
+count successful or failed runs.
+
+Example Usage:
+- "How many times did action <uuid> run, and how many succeeded?"
+- "Show failed runs of action <uuid>"`,
 
   delete: `Delete an Action Assignment (delete_action)
 
