@@ -71,9 +71,14 @@ import {
   assignAction,
   triggerAction,
   deleteAction,
+  updateAction,
+  getActionOutput,
+  listActionRuns,
   formatActionCatalog,
   formatMyActions,
+  formatActionRuns,
   ACTION_STATUS_LABELS,
+  ACTION_OUTPUT_STATUS_LABELS,
 } from "./index.js";
 import type { AssetRiskDetail } from "./index.js";
 
@@ -251,7 +256,8 @@ asset:add_assets, asset:check_ownership, crawler:overview, crawler:get_settings,
 crawler:included_urls, crawler:custom_headers, report:overview, report:get_vulnerabilities,
 report:severity_summary, report:export_report, report:vulnerability_categories, dashboard:overview,
 dashboard:security_summary, dashboard:scan_history, dashboard:open_ports, dashboard:monthly_stats,
-action:overview, action:catalog, action:assign, action:trigger, action:delete, action:list_my`,
+action:overview, action:catalog, action:assign, action:update, action:trigger, action:output, action:history,
+action:delete, action:list_my`,
     schema: z.object({
       topic: z.string().optional().default("overview").describe("Help topic"),
     }),
@@ -1802,6 +1808,89 @@ approved in the S4E dashboard before it can run via trigger_action or automatica
       return createToolResult({
         success: false,
         message: "Failed to assign action",
+        error: result.error || result.message,
+      });
+    },
+  },
+  {
+    name: "update_action",
+    description: `Update an existing action assignment: custom_parameters, interval (minutes) and/or scan_slugs.
+Omitted fields keep their stored value; send at least one. The assignment status does not change.
+Note: custom_parameters replaces the stored object, so send the full object (read it with list_my_actions first).`,
+    schema: z.object({
+      action_uniq_uuid: z.string().min(3).max(64).describe("Unique identifier of the assigned action to update"),
+      custom_parameters: z.record(z.string(), z.unknown()).optional().describe("New custom parameters (replaces the stored ones)"),
+      interval: z.number().int().min(0).max(1000000).optional().describe("Automatic run interval in minutes (e.g. 2880 = 2 days)"),
+      scan_slugs: z.array(z.string()).max(5).optional().describe("Scan slugs that auto-trigger this action"),
+    }),
+    handler: async (client, params) => {
+      const result = await updateAction(client, params as unknown as Parameters<typeof updateAction>[1]);
+      if (result.success) {
+        return createToolResult({
+          success: true,
+          message: result.message || "Action assignment updated successfully",
+        });
+      }
+      return createToolResult({
+        success: false,
+        message: "Failed to update action assignment",
+        error: result.error || result.message,
+      });
+    },
+  },
+  {
+    name: "get_action_output",
+    description: `Read the result of a single action run by slug (the slug returned by trigger_action).
+status: 0=running, 1=success, 2=error, 3=timeout. Poll while status is 0.`,
+    schema: z.object({
+      slug: z.string().min(3).max(64).describe("Run slug returned by trigger_action"),
+    }),
+    handler: async (client, params) => {
+      const result = await getActionOutput(client, params as unknown as Parameters<typeof getActionOutput>[1]);
+      if (result.success && result.data) {
+        return createToolResult({
+          success: true,
+          message: `Run status: ${ACTION_OUTPUT_STATUS_LABELS[result.data.status] ?? result.data.status}`,
+          data: result.data,
+          info: { status_legend: ACTION_OUTPUT_STATUS_LABELS },
+        });
+      }
+      return createToolResult({
+        success: false,
+        message: "Failed to retrieve action output",
+        error: result.error || result.message,
+      });
+    },
+  },
+  {
+    name: "list_action_runs",
+    description: `List past runs of an assigned action, newest first. total_count is the number of matching runs,
+so use status=1 (success) or status=2 (error) to count successful or failed runs. status: 0=running, 1=success, 2=error, 3=timeout.`,
+    schema: z.object({
+      action_uniq_uuid: z.string().min(3).max(64).describe("Unique identifier of the assigned action"),
+      status: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]).optional().describe("Filter by run status"),
+      search_text: z.string().min(2).max(300).optional().describe("Search in output content and action name"),
+      page: z.number().optional().default(1).describe("Page number"),
+      per_page: z.number().optional().default(20).describe("Results per page (max 100)"),
+    }),
+    handler: async (client, params) => {
+      const result = await listActionRuns(client, params as unknown as Parameters<typeof listActionRuns>[1]);
+      if (result.success && result.data) {
+        const items = result.data.data || [];
+        return createToolResult({
+          success: true,
+          message: `${items.length} run(s) returned`,
+          formatted: formatActionRuns(items),
+          data: items,
+          info: {
+            total_count: result.data.count,
+            status_legend: ACTION_OUTPUT_STATUS_LABELS,
+          },
+        });
+      }
+      return createToolResult({
+        success: false,
+        message: "Failed to retrieve action runs",
         error: result.error || result.message,
       });
     },
