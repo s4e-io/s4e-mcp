@@ -149,10 +149,15 @@ export {
   assignAction,
   triggerAction,
   deleteAction,
+  updateAction,
+  getActionOutput,
+  listActionRuns,
   formatActionCatalog,
   formatMyActions,
+  formatActionRuns,
   ACTION_TOPICS,
   ACTION_STATUS_LABELS,
+  ACTION_OUTPUT_STATUS_LABELS,
 } from "./action/index.js";
 export type {
   ActionCatalogItem,
@@ -166,6 +171,12 @@ export type {
   TriggerActionParams,
   TriggerActionResponse,
   DeleteActionParams,
+  UpdateActionParams,
+  ActionOutputStatus,
+  ActionOutputItem,
+  GetActionOutputParams,
+  ListActionRunsParams,
+  ActionRunsResponse,
 } from "./action/index.js";
 
 // Dashboard tools

@@ -87,3 +87,42 @@ export interface TriggerActionResponse {
 export interface DeleteActionParams {
   action_uniq_uuid: string;
 }
+
+export interface UpdateActionParams {
+  action_uniq_uuid: string;
+  custom_parameters?: Record<string, unknown>;
+  interval?: number;
+  scan_slugs?: string[];
+}
+
+// Run status: 0=running, 1=success, 2=error, 3=timeout
+export type ActionOutputStatus = 0 | 1 | 2 | 3;
+
+export interface ActionOutputItem {
+  slug: string;
+  action_uniq_uuid: string;
+  action_name?: string;
+  scan_output_slug?: string;
+  status: ActionOutputStatus;
+  started_at: number | null;
+  finished_at: number | null;
+  output: string;
+  [key: string]: unknown;
+}
+
+export interface GetActionOutputParams {
+  slug: string;
+}
+
+export interface ListActionRunsParams {
+  action_uniq_uuid: string;
+  status?: ActionOutputStatus;
+  search_text?: string;
+  page?: number;
+  per_page?: number;
+}
+
+export interface ActionRunsResponse {
+  data: ActionOutputItem[];
+  count: number;
+}

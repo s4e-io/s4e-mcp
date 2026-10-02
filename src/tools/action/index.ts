@@ -15,6 +15,11 @@ import {
   TriggerActionParams,
   TriggerActionResponse,
   DeleteActionParams,
+  UpdateActionParams,
+  GetActionOutputParams,
+  ActionOutputItem,
+  ListActionRunsParams,
+  ActionRunsResponse,
 } from "./types.js";
 
 export * from "./types.js";
@@ -24,6 +29,13 @@ export const ACTION_STATUS_LABELS: Record<number, string> = {
   1: "active",
   2: "disabled",
   3: "pending_approval",
+};
+
+export const ACTION_OUTPUT_STATUS_LABELS: Record<number, string> = {
+  0: "running",
+  1: "success",
+  2: "error",
+  3: "timeout",
 };
 
 /**
@@ -76,6 +88,36 @@ export async function deleteAction(
   return client.request<null>("/action/handler/delete", { ...params });
 }
 
+/**
+ * Update an assignment's custom_parameters, interval and/or scan_slugs.
+ */
+export async function updateAction(
+  client: S4EClient,
+  params: UpdateActionParams
+): Promise<S4EApiResponse<null>> {
+  return client.request<null>("/action/handler/update", { ...params });
+}
+
+/**
+ * Read a single run result by slug (as returned by trigger_action).
+ */
+export async function getActionOutput(
+  client: S4EClient,
+  params: GetActionOutputParams
+): Promise<S4EApiResponse<ActionOutputItem>> {
+  return client.request<ActionOutputItem>("/action/output/get", { ...params });
+}
+
+/**
+ * List past runs of an assigned action; count is the total number of matching runs.
+ */
+export async function listActionRuns(
+  client: S4EClient,
+  params: ListActionRunsParams
+): Promise<S4EApiResponse<ActionRunsResponse>> {
+  return client.request<ActionRunsResponse>("/action/output/history", { ...params });
+}
+
 export function formatActionCatalog(items: ActionCatalogItem[]): string {
   if (items.length === 0) return "No actions found.";
   return items
@@ -94,4 +136,14 @@ export function formatMyActions(items: ActionAssignmentItem[]): string {
       return `- **${a.action_name}** (${status})\n  UUID: \`${a.action_uniq_uuid}\`\n  ${a.action_description}`;
     })
     .join("\n\n");
+}
+
+export function formatActionRuns(items: ActionOutputItem[]): string {
+  if (items.length === 0) return "No action runs found.";
+  return items
+    .map((r) => {
+      const status = ACTION_OUTPUT_STATUS_LABELS[r.status] ?? String(r.status);
+      return `- \`${r.slug}\` (${status})`;
+    })
+    .join("\n");
 }

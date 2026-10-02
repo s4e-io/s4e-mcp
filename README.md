@@ -61,7 +61,7 @@ S4E MCP Server starting...
   Env:     local
   API URL: https://api.s4e.io/api
   Listen:  http://0.0.0.0:8000
-Registered 32 tools
+Registered 40 tools
 MCP endpoint: http://0.0.0.0:8000/mcp
 ```
 
@@ -71,7 +71,7 @@ Quick health check:
 
 ```bash
 curl http://localhost:8787/health
-# → {"status":"ok","env":"local","apiUrl":"...","tools":32}
+# → {"status":"ok","env":"local","apiUrl":"...","tools":40}
 ```
 
 ### Platform Notes
@@ -201,7 +201,7 @@ After adding the client, try simple prompts:
 - "Show my asset list"
 - "Start a full scan for example.com"
 
-If the first request doesn't return `/health` 200 + `tools: 32`, see **Troubleshooting** below.
+If the first request doesn't return `/health` 200 + `tools: 40`, see **Troubleshooting** below.
 
 ---
 
@@ -273,7 +273,7 @@ src/
 │   └── index.ts           # Barrel export
 │
 ├── tools/                 # Domain modules
-│   ├── registry.ts        # TOOL_DEFINITIONS — SINGLE SOURCE (32 tools)
+│   ├── registry.ts        # TOOL_DEFINITIONS — SINGLE SOURCE (40 tools)
 │   ├── user/              # Token verify, user info
 │   ├── scans/             # Full / light / crawler scan
 │   ├── assets/            # Domain, IP, CIDR asset management
