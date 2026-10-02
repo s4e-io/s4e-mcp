@@ -60,7 +60,7 @@ S4E MCP Server starting...
   Env:     local
   API URL: https://api.s4e.io/api
   Listen:  http://0.0.0.0:8000
-Registered 32 tools
+Registered 40 tools
 MCP endpoint: http://0.0.0.0:8000/mcp
 ```
 
@@ -70,7 +70,7 @@ Hizli saglik kontrolu:
 
 ```bash
 curl http://localhost:8787/health
-# → {"status":"ok","env":"local","apiUrl":"...","tools":32}
+# → {"status":"ok","env":"local","apiUrl":"...","tools":40}
 ```
 
 ### Platform Notlari
@@ -200,7 +200,7 @@ Istemci eklendikten sonra basit komutlarla dene:
 - "Asset listemi goster"
 - "example.com icin full scan baslat"
 
-Ilk istek `/health` 200 + `tools: 32` dondurmuyorsa **Hata Durumunda** bolumune bak (asagida).
+Ilk istek `/health` 200 + `tools: 40` dondurmuyorsa **Hata Durumunda** bolumune bak (asagida).
 
 ---
 
@@ -272,7 +272,7 @@ src/
 │   └── index.ts           # Barrel export
 │
 ├── tools/                 # Domain modulleri
-│   ├── registry.ts        # TOOL_DEFINITIONS — TEK KAYNAK (32 tool)
+│   ├── registry.ts        # TOOL_DEFINITIONS — TEK KAYNAK (40 tool)
 │   ├── user/              # Token verify, user info
 │   ├── scans/             # Full / light / crawler scan
 │   ├── assets/            # Domain, IP, CIDR varlik yonetimi
