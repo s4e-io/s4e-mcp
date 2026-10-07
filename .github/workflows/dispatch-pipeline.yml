@@ -10,11 +10,9 @@ jobs:
     steps:
       - name: Dispatch to s4e-mcp-pipeline
         env:
-          GH_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
-          BRANCH: ${{ github.ref_name }}
+          GH_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
         run: |
-          curl -fsSL -X POST \
-            -H "Authorization: token ${GH_ACCESS_TOKEN}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/s4e-io/s4e-mcp-pipeline/dispatches \
-            -d "{\"event_type\": \"source-push\", \"client_payload\": {\"branch\": \"${BRANCH}\"}}"
+          gh api repos/s4e-io/s4e-mcp-pipeline/dispatches \
+            --method POST \
+            --field event_type=source-push \
+            --field client_payload='{"branch":"${{ github.ref_name }}"}'
