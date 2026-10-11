@@ -241,7 +241,10 @@ export const ALL_TOPICS = {
   "action:overview": ACTION_TOPICS.overview,
   "action:catalog": ACTION_TOPICS.catalog,
   "action:assign": ACTION_TOPICS.assign,
+  "action:update": ACTION_TOPICS.update,
   "action:trigger": ACTION_TOPICS.trigger,
+  "action:output": ACTION_TOPICS.output,
+  "action:history": ACTION_TOPICS.history,
   "action:delete": ACTION_TOPICS.delete,
   "action:list_my": ACTION_TOPICS.list_my,
 } as const;
@@ -257,7 +260,7 @@ export const TOPIC_CATEGORIES = {
   report: ["report:overview", "report:get_vulnerabilities", "report:severity_summary", "report:export_report", "report:vulnerability_categories"],
   dashboard: ["dashboard:overview", "dashboard:security_summary", "dashboard:scan_history", "dashboard:open_ports", "dashboard:monthly_stats", "dashboard:terminal"],
   crawler: ["crawler:overview", "crawler:get_settings", "crawler:excluded_urls", "crawler:included_urls", "crawler:custom_headers"],
-  action: ["action:overview", "action:catalog", "action:assign", "action:trigger", "action:delete", "action:list_my"],
+  action: ["action:overview", "action:catalog", "action:assign", "action:update", "action:trigger", "action:output", "action:history", "action:delete", "action:list_my"],
 } as const;
 
 // Topic descriptions
@@ -314,7 +317,10 @@ export const TOPIC_DESCRIPTIONS: Record<HelpTopic, string> = {
   "action:overview": "Action automation catalog overview",
   "action:catalog": "Browsing the action catalog",
   "action:assign": "Assigning an action",
+  "action:update": "Updating an action assignment",
   "action:trigger": "Manually running an action",
+  "action:output": "Reading an action run result",
+  "action:history": "Action run history and counts",
   "action:delete": "Removing an action assignment",
   "action:list_my": "Listing your action assignments",
 };

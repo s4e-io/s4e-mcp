@@ -1,0 +1,18 @@
+name: Trigger MCP Pipeline
+
+on:
+  push:
+    branches: [testing, release]
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch to s4e-mcp-pipeline
+        env:
+          GH_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          jq -n --arg branch "$BRANCH" \
+            '{"event_type":"source-push","client_payload":{"branch":$branch}}' | \
+          gh api repos/s4e-io/s4e-mcp-pipeline/dispatches --method POST --input -
