@@ -1,7 +1,6 @@
---
 # S4E.io MCP Server
 
-> 🇹🇷 [Türkçe README](./README.tr.md)
+> 🇹🇷 [Turkish](./README.tr.md)
 
 [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server for the S4E.io cybersecurity platform. Lets Claude Code, Cursor, and other MCP-compatible clients interact with the S4E.io API using natural language.
 
