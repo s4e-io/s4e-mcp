@@ -1,6 +1,6 @@
 # S4E.io MCP Server
 
-> [English README](./README.md)
+> [English](./README.md)
 
 S4E.io siber guvenlik platformu icin [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server. Claude Code, Cursor ve diger MCP uyumlu istemcilerin S4E.io API'si ile dogal dilde etkilesime girmesini saglar.
 
