@@ -158,6 +158,10 @@ function buildServer(token: string): McpServer {
 const app = new Hono<{ Bindings: HttpBindings }>();
 
 app.use("*", logger());
+// CORS is intentionally open (origin "*"): authentication is the per-request
+// S4E-API-Token header, not cookies, so cross-origin callers get no ambient
+// credentials. If you expose this server publicly, restrict `origin` to your
+// own clients and run it behind a reverse proxy rather than binding it directly.
 app.use("/mcp", cors({
   origin: "*",
   allowMethods: ["POST", "GET", "DELETE", "OPTIONS"],
