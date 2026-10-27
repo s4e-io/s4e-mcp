@@ -46,7 +46,8 @@ export type ScanCategorySlug =
   | "information-scans"
   | "product-based-web-vulnerabilities"
   | "product-based-network-vulnerabilities"
-  | "exposed-panels";
+  | "exposed-panels"
+  | "ai-generated";
 
 export const SCAN_CATEGORY_LABELS: Record<ScanCategorySlug, string> = {
   "dns-controls": "DNS Controls",
@@ -58,6 +59,7 @@ export const SCAN_CATEGORY_LABELS: Record<ScanCategorySlug, string> = {
   "product-based-web-vulnerabilities": "Product-Based Web Vulnerabilities",
   "product-based-network-vulnerabilities": "Product-Based Network Vulnerabilities",
   "exposed-panels": "Exposed Panels",
+  "ai-generated": "AI Generated",
 };
 
 // Vulnerability report
