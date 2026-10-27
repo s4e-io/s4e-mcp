@@ -507,7 +507,7 @@ Examples: "sql injection", "xss", "ssl", "dns", "cve-2021-44228", "log4j", "subd
   {
     name: "list_scans",
     description: `List available scan types.
-Categories: dns-controls, ssl-controls, misconfiguration, network-vulnerabilities, web-vulnerabilities, information-scans, product-based-web-vulnerabilities, product-based-network-vulnerabilities, exposed-panels`,
+Categories: dns-controls, ssl-controls, misconfiguration, network-vulnerabilities, web-vulnerabilities, information-scans, product-based-web-vulnerabilities, product-based-network-vulnerabilities, exposed-panels, ai-generated`,
     schema: z.object({
       query: z.string().optional().describe("Search text (e.g. 'cve', 'sql', 'xss')"),
       category: z.string().optional().describe("Category filter (e.g. 'dns-controls')"),
@@ -540,7 +540,7 @@ Categories: dns-controls, ssl-controls, misconfiguration, network-vulnerabilitie
             categories: [
               "dns-controls", "ssl-controls", "misconfiguration",
               "network-vulnerabilities", "web-vulnerabilities",
-              "information-scans", "exposed-panels"
+              "information-scans", "exposed-panels", "ai-generated"
             ],
             usage: "To start a specific scan, use the start_single_scan tool",
           },
