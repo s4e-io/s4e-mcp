@@ -79,6 +79,13 @@ import {
   formatActionRuns,
   ACTION_STATUS_LABELS,
   ACTION_OUTPUT_STATUS_LABELS,
+  listServices,
+  countServicesByPort,
+  countServicesByProtocol,
+  setServiceScanEnabled,
+  formatServiceList,
+  formatPortCounts,
+  formatProtocolCounts,
 } from "./index.js";
 import type { AssetRiskDetail } from "./index.js";
 
@@ -257,7 +264,7 @@ crawler:included_urls, crawler:custom_headers, report:overview, report:get_vulne
 report:severity_summary, report:export_report, report:vulnerability_categories, dashboard:overview,
 dashboard:security_summary, dashboard:scan_history, dashboard:open_ports, dashboard:monthly_stats,
 action:overview, action:catalog, action:assign, action:update, action:trigger, action:output, action:history,
-action:delete, action:list_my`,
+action:delete, action:list_my, service:overview, service:list, service:counts, service:scan_enabled`,
     schema: z.object({
       topic: z.string().optional().default("overview").describe("Help topic"),
     }),
@@ -1937,6 +1944,158 @@ Soft delete: the assignment is disabled (status=2) rather than removed, so its r
       return createToolResult({
         success: false,
         message: "Failed to delete action assignment",
+        error: result.error || result.message,
+      });
+    },
+  },
+  // ==================== SERVICE MANAGER TOOLS ====================
+  {
+    name: "list_services",
+    description: `List services detected on your assets (Service Manager): each item is an asset + port pair with
+its protocol, presence_state (active = still seen, passive = no longer seen), seen/missing counts and
+whether scans run on it (if_scan_enabled). total_count is the number of matching services.`,
+    schema: z.object({
+      ports: z.array(z.number().int()).optional().describe("Only these ports"),
+      ports_exclude: z.array(z.number().int()).optional().describe("Exclude these ports"),
+      protocol_ids: z.array(z.number().int()).optional().describe("Only these protocol ids"),
+      protocol_ids_exclude: z.array(z.number().int()).optional().describe("Exclude these protocol ids"),
+      presence_state: z.enum(["active", "passive"]).optional().describe("active or passive services"),
+      asset_ids: z.array(z.number().int()).optional().describe("Only these asset ids"),
+      assets: z.array(z.string()).optional().describe("Only these asset names (e.g. example.com)"),
+      tag_ids: z.array(z.number().int()).optional().describe("Only assets with these tag ids"),
+      order_by: z
+        .enum(["port", "protocol_id", "seen_count", "missing_count", "first_seen_at", "last_seen_at", "last_updated_at"])
+        .optional()
+        .describe("Sort field (default last_updated_at)"),
+      order_type: z.enum(["asc", "desc"]).optional().describe("Sort direction (default desc)"),
+      page: z.number().int().min(1).optional().default(1).describe("Page number"),
+      per_page: z.number().int().min(1).max(500).optional().default(20).describe("Results per page (max 500)"),
+    }),
+    handler: async (client, params) => {
+      const result = await listServices(client, params as unknown as Parameters<typeof listServices>[1]);
+      if (result.success && result.data) {
+        const items = result.data.data || [];
+        return createToolResult({
+          success: true,
+          message: `${items.length} service(s) returned`,
+          formatted: formatServiceList(items),
+          data: items,
+          info: {
+            total_count: result.data.count,
+            service_manager_url: `${APP_ORIGIN}/service-manager`,
+          },
+        });
+      }
+      return createToolResult({
+        success: false,
+        message: "Failed to retrieve services",
+        error: result.error || result.message,
+      });
+    },
+  },
+  {
+    name: "count_services_by_port",
+    description: `Number of assets per open port (Top Ports on the Service Manager page). Takes the same filters as list_services.
+Use presence_state="active" for ports that are open now.`,
+    schema: z.object({
+      presence_state: z.enum(["active", "passive"]).optional().describe("active or passive services"),
+      ports: z.array(z.number().int()).optional().describe("Only these ports"),
+      ports_exclude: z.array(z.number().int()).optional().describe("Exclude these ports"),
+      protocol_ids: z.array(z.number().int()).optional().describe("Only these protocol ids"),
+      asset_ids: z.array(z.number().int()).optional().describe("Only these asset ids"),
+      assets: z.array(z.string()).optional().describe("Only these asset names"),
+      order_by: z.enum(["port", "asset_count"]).optional().describe("Sort field (default asset_count)"),
+      order_type: z.enum(["asc", "desc"]).optional().describe("Sort direction (default desc)"),
+      page: z.number().int().min(1).optional().default(1).describe("Page number"),
+      per_page: z.number().int().min(1).max(500).optional().default(10).describe("Results per page (max 500)"),
+    }),
+    handler: async (client, params) => {
+      const result = await countServicesByPort(client, params as unknown as Parameters<typeof countServicesByPort>[1]);
+      if (result.success && result.data) {
+        const items = result.data.data || [];
+        return createToolResult({
+          success: true,
+          message: `${items.length} port(s) returned`,
+          formatted: formatPortCounts(items),
+          data: items,
+          info: { total_count: result.data.count },
+        });
+      }
+      return createToolResult({
+        success: false,
+        message: "Failed to retrieve port counts",
+        error: result.error || result.message,
+      });
+    },
+  },
+  {
+    name: "count_services_by_protocol",
+    description: `Number of services per protocol (Top Services on the Service Manager page). The returned protocol_id
+can be used as a protocol_ids filter in list_services. protocol_name null means the protocol is unknown.`,
+    schema: z.object({
+      presence_state: z.enum(["active", "passive"]).optional().describe("active or passive services"),
+      ports: z.array(z.number().int()).optional().describe("Only these ports"),
+      ports_exclude: z.array(z.number().int()).optional().describe("Exclude these ports"),
+      protocol_ids: z.array(z.number().int()).optional().describe("Only these protocol ids"),
+      asset_ids: z.array(z.number().int()).optional().describe("Only these asset ids"),
+      assets: z.array(z.string()).optional().describe("Only these asset names"),
+      tag_ids: z.array(z.number().int()).min(1).max(50).optional().describe("Only assets with these tag ids"),
+      order_by: z.enum(["protocol_name", "count"]).optional().describe("Sort field (default count)"),
+      order_type: z.enum(["asc", "desc"]).optional().describe("Sort direction (default desc)"),
+      page: z.number().int().min(1).optional().default(1).describe("Page number"),
+      per_page: z.number().int().min(1).max(500).optional().default(10).describe("Results per page (max 500)"),
+    }),
+    handler: async (client, params) => {
+      const result = await countServicesByProtocol(client, params as unknown as Parameters<typeof countServicesByProtocol>[1]);
+      if (result.success && result.data) {
+        const items = result.data.data || [];
+        return createToolResult({
+          success: true,
+          message: `${items.length} protocol(s) returned`,
+          formatted: formatProtocolCounts(items),
+          data: items,
+          info: { total_count: result.data.count },
+        });
+      }
+      return createToolResult({
+        success: false,
+        message: "Failed to retrieve protocol counts",
+        error: result.error || result.message,
+      });
+    },
+  },
+  {
+    name: "set_service_scan_enabled",
+    description: `Turn security scanning on or off for every service matching the filters (the Scan switch on the Service Manager page).
+At least one filter is required. To change a single service send asset_ids=[id] and ports=[port].
+Requires an API token with write permission. Confirm with the user before changing many services.`,
+    schema: z.object({
+      if_scan_enabled: z.boolean().describe("true: scan the services, false: stop scanning them"),
+      asset_ids: z.array(z.number().int()).optional().describe("Only these asset ids"),
+      ports: z.array(z.number().int()).optional().describe("Only these ports"),
+      protocol_ids: z.array(z.number().int()).optional().describe("Only these protocol ids"),
+      presence_state: z.enum(["active", "passive"]).optional().describe("Only active or passive services"),
+      tag_ids: z.array(z.number().int()).optional().describe("Only assets with these tag ids"),
+    }),
+    handler: async (client, params) => {
+      const p = params as unknown as Parameters<typeof setServiceScanEnabled>[1];
+      if (!(p.asset_ids?.length || p.ports?.length || p.protocol_ids?.length || p.presence_state || p.tag_ids?.length)) {
+        return createToolResult({
+          success: false,
+          message: "At least one filter is required: asset_ids, ports, protocol_ids, presence_state or tag_ids",
+        });
+      }
+      const result = await setServiceScanEnabled(client, p);
+      if (result.success && result.data) {
+        return createToolResult({
+          success: true,
+          message: `Scanning ${p.if_scan_enabled ? "enabled" : "disabled"} for ${result.data.updated} service(s)`,
+          data: result.data,
+        });
+      }
+      return createToolResult({
+        success: false,
+        message: "Failed to update service scanning",
         error: result.error || result.message,
       });
     },
