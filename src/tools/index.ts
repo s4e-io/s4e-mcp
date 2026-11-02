@@ -211,3 +211,27 @@ export type {
   UserRiskScoreResponse,
   AssetRiskDetail,
 } from "./dashboard/index.js";
+
+// Service tools
+export {
+  listServices,
+  countServicesByPort,
+  countServicesByProtocol,
+  setServiceScanEnabled,
+  formatServiceList,
+  formatPortCounts,
+  formatProtocolCounts,
+  SERVICE_TOPICS,
+} from "./services/index.js";
+export type {
+  PresenceState,
+  ListServicesParams,
+  ServiceItem,
+  CountServicesByPortParams,
+  ServicePortCount,
+  CountServicesByProtocolParams,
+  ServiceProtocolCount,
+  ServiceListResponse,
+  SetServiceScanEnabledParams,
+  SetServiceScanEnabledResponse,
+} from "./services/index.js";
