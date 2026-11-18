@@ -9,6 +9,7 @@ import { REPORT_TOPICS, ReportTopicKey } from "../reports/topics.js";
 import { DASHBOARD_TOPICS, DashboardTopicKey } from "../dashboard/topics.js";
 import { CRAWLER_TOPICS, CrawlerTopicKey } from "../crawler/topics.js";
 import { ACTION_TOPICS, ActionTopicKey } from "../action/topics.js";
+import { SERVICE_TOPICS, ServiceTopicKey } from "../services/topics.js";
 import { APP_ORIGIN } from "../../core/config.js";
 
 // Re-export individual topics
@@ -19,6 +20,7 @@ export { REPORT_TOPICS } from "../reports/topics.js";
 export { DASHBOARD_TOPICS } from "../dashboard/topics.js";
 export { CRAWLER_TOPICS } from "../crawler/topics.js";
 export { ACTION_TOPICS } from "../action/topics.js";
+export { SERVICE_TOPICS } from "../services/topics.js";
 
 // General help topics
 export const GENERAL_TOPICS = {
@@ -247,6 +249,10 @@ export const ALL_TOPICS = {
   "action:history": ACTION_TOPICS.history,
   "action:delete": ACTION_TOPICS.delete,
   "action:list_my": ACTION_TOPICS.list_my,
+  "service:overview": SERVICE_TOPICS.overview,
+  "service:list": SERVICE_TOPICS.list,
+  "service:counts": SERVICE_TOPICS.counts,
+  "service:scan_enabled": SERVICE_TOPICS.scan_enabled,
 } as const;
 
 export type HelpTopic = keyof typeof ALL_TOPICS;
@@ -261,6 +267,7 @@ export const TOPIC_CATEGORIES = {
   dashboard: ["dashboard:overview", "dashboard:security_summary", "dashboard:scan_history", "dashboard:open_ports", "dashboard:monthly_stats", "dashboard:terminal"],
   crawler: ["crawler:overview", "crawler:get_settings", "crawler:excluded_urls", "crawler:included_urls", "crawler:custom_headers"],
   action: ["action:overview", "action:catalog", "action:assign", "action:update", "action:trigger", "action:output", "action:history", "action:delete", "action:list_my"],
+  service: ["service:overview", "service:list", "service:counts", "service:scan_enabled"],
 } as const;
 
 // Topic descriptions
@@ -323,4 +330,10 @@ export const TOPIC_DESCRIPTIONS: Record<HelpTopic, string> = {
   "action:history": "Action run history and counts",
   "action:delete": "Removing an action assignment",
   "action:list_my": "Listing your action assignments",
+
+  // Service
+  "service:overview": "Service Manager overview",
+  "service:list": "Listing services (asset + port)",
+  "service:counts": "Service counts by port and protocol",
+  "service:scan_enabled": "Turning service scanning on or off",
 };

@@ -26,6 +26,7 @@ export const SCAN_CATEGORY_SLUGS = [
   "product-based-web-vulnerabilities",
   "product-based-network-vulnerabilities",
   "exposed-panels",
+  "ai-generated",
 ] as const;
 
 export type ScanCategory = (typeof SCAN_CATEGORY_SLUGS)[number];
